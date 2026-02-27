@@ -21,16 +21,28 @@ function App() {
     setTodos((prevTodos) => prevTodos.map((item) => item.id === id ? {...item, completed: !item.completed} : item));
   }
 
+  // Load todos from localStorage on component mount
   useEffect(() => {
-    const todos = JSON.parse(localStorage.getItem("todos"))
-
-    if (todos && todos.length > 0 ) {
-      setTodos(todos)
+    try {
+      const storedTodos = localStorage.getItem("todos")
+      if (storedTodos) {
+        const parsedTodos = JSON.parse(storedTodos)
+        if (Array.isArray(parsedTodos) && parsedTodos.length > 0) {
+          setTodos(parsedTodos)
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load todos from localStorage:", error)
     }
   }, [])
 
+  // Save todos to localStorage whenever they change
   useEffect(() => {
-  localStorage.setItem("todos", JSON.stringify(todos))  
+    try {
+      localStorage.setItem("todos", JSON.stringify(todos))
+    } catch (error) {
+      console.error("Failed to save todos to localStorage:", error)
+    }
   }, [todos])
   
   
