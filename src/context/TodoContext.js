@@ -1,5 +1,9 @@
 import { useContext, createContext } from "react";
 
+/**
+ * TodoContext provides todo state and operations throughout the app.
+ * Includes localStorage persistence for data retention across sessions.
+ */
 export const TodoContext = createContext({
     todos: [
         {
@@ -11,7 +15,7 @@ export const TodoContext = createContext({
     addTodos: (todo) => {},
     updateTodo: (id, todo) => {},
     deleteTodo: (id) => {},
-    toggleComplete: (id) => {} 
+    toggleCompleted: (id) => {} 
 })
 
 export const useTodo = () => {
