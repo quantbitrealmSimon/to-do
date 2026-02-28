@@ -2,6 +2,15 @@ import React, { useState, useEffect } from "react";
 import { TodoForm, TodoItem } from "./components";
 import { TodoProvider } from "./context";
 
+/**
+ * Main App component for the Todo application.
+ * Features:
+ * - Add, update, delete, and toggle todos
+ * - Persistent storage using localStorage with error handling
+ * - Graceful handling of corrupted or unavailable storage
+ *
+ * @returns {JSX.Element} The rendered Todo app
+ */
 function App() {
   const [todos, setTodos] = useState([])
 
@@ -21,16 +30,34 @@ function App() {
     setTodos((prevTodos) => prevTodos.map((item) => item.id === id ? {...item, completed: !item.completed} : item));
   }
 
+  // Load todos from localStorage on mount with error handling
   useEffect(() => {
-    const todos = JSON.parse(localStorage.getItem("todos"))
-
-    if (todos && todos.length > 0 ) {
-      setTodos(todos)
+    try {
+      const storedTodos = localStorage.getItem("todos")
+      if (storedTodos) {
+        const parsedTodos = JSON.parse(storedTodos)
+        if (Array.isArray(parsedTodos) && parsedTodos.length > 0) {
+          setTodos(parsedTodos)
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load todos from localStorage:", error)
+      // Clear corrupted data
+      localStorage.removeItem("todos")
     }
   }, [])
 
+  // Save todos to localStorage whenever they change with error handling
   useEffect(() => {
-  localStorage.setItem("todos", JSON.stringify(todos))  
+    try {
+      localStorage.setItem("todos", JSON.stringify(todos))
+    } catch (error) {
+      if (error.name === "QuotaExceededError") {
+        console.error("localStorage quota exceeded. Unable to save todos.")
+      } else {
+        console.error("Failed to save todos to localStorage:", error)
+      }
+    }
   }, [todos])
   
   
